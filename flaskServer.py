@@ -22,10 +22,9 @@ class User(UserMixin):
 def load_user(user_id):
     return User(user_id)
 
-# main route
 @app.route('/')
-def home():
-    return "Welcome to the Chatbot!"
+def index():
+    return render_template('index.html')
 
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
