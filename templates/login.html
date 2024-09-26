@@ -71,8 +71,10 @@
         }
 
         .image-container img {
-            width: 100px;
-            height: auto;
+            width: 80%;      /* The image will take up 30% of the container's width */
+			max-width: 500px; /* Maximum width is 150px */
+			height: auto;    /* Height adjusts automatically */
+			margin-bottom: 20px;
         }
 
         footer {
@@ -95,7 +97,7 @@
 
     <div class="container">
         <div class="image-container">
-            <img src="https://cdn.pixabay.com/photo/2017/10/18/16/08/robot-2864349_960_720.png" alt="Chatbot Illustration" />
+            <img src="{{ url_for('static', filename='images/ai-generated-8623019_1280.jpg') }}" alt="Chatbot Illustration" />
         </div>
 
         <h1>Login to Chatbot</h1>
