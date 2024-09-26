@@ -41,7 +41,7 @@ def login():
 
 # Chat page with WebSocket connection
 @app.route('/chat')
-@login_required
+#@login_required
 def chat():
     return render_template('chat.html')
 
