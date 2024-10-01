@@ -41,10 +41,13 @@ class User(UserMixin):
         self.password = password
 
     @staticmethod
-    def get_user_by_username(username):
+    def get_user_by_id(user_id):
         # Retrieve user from DynamoDB
-        response = users_table.get_item(Key={'username': username})
-        return response.get('Item')
+        response = users_table.get_item(Key={'username': user_id})
+        if 'Item' in response:
+            data = response['Item']
+            return User(data['username'], data['email'], data['password'])
+        return None
 
     @staticmethod
     def create_user(username, email, password):
@@ -57,9 +60,9 @@ class User(UserMixin):
             }
         )
 
-#@login_manager.user_loader
-#def load_user(user_id):
-#    return User(user_id)
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get_user_by_id(user_id)
 
 @app.route('/')
 def index():
@@ -83,7 +86,7 @@ def login():
     password = request.form['password']
 
     # Fetch the user from DynamoDB
-    user_data = User.get_user_by_username(username)
+    user_data = User.get_user_by_id(username)
 
     if user_data and bcrypt.check_password_hash(user_data['password'], password):
         # Login the user
