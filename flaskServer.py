@@ -34,11 +34,28 @@ login_manager.init_app(app)
 #        self.id = id
 
 # V2
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    email = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
+class User(UserMixin):
+    def __init__(self, username, email, password):
+        self.username = username
+        self.email = email
+        self.password = password
+
+    @staticmethod
+    def get_user_by_username(username):
+        # Retrieve user from DynamoDB
+        response = users_table.get_item(Key={'username': username})
+        return response.get('Item')
+
+    @staticmethod
+    def create_user(username, email, password):
+        # Add a new user to DynamoDB
+        users_table.put_item(
+            Item={
+                'username': username,
+                'email': email,
+                'password': password
+            }
+        )
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -65,21 +82,17 @@ def login():
     username = request.form['username']
     password = request.form['password']
 
-    # Fetch user details from DynamoDB
-    response = users_table.get_item(
-        Key={
-            'username': username
-        }
-    )
+    # Fetch the user from DynamoDB
+    user_data = User.get_user_by_username(username)
 
-    user = response.get('Item')
-    
-    if user and bcrypt.check_password_hash(user['password'], password):
+    if user_data and bcrypt.check_password_hash(user_data['password'], password):
+        # Login the user
+        user = User(username=user_data['username'], email=user_data['email'], password=user_data['password'])
+        login_user(user)
         flash('Login successful!', 'success')
-        # Add your logic for session handling
         return redirect(url_for('chat'))
     else:
-        flash('Login failed. Check your username and password.', 'danger')
+        flash('Login failed. Please check your credentials.', 'danger')
         return redirect(url_for('login'))
 
 @app.route('/register', methods=['POST'])
@@ -91,17 +104,15 @@ def register():
     # Hash the password
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    # Insert into DynamoDB
-    users_table.put_item(
-        Item={
-            'username': username,
-            'email': email,
-            'password': hashed_password
-        }
-    )
+    # Check if user already exists
+    if User.get_user_by_username(username):
+        flash('Username already exists!', 'danger')
+        return redirect(url_for('register'))
 
+    # Create new user in DynamoDB
+    User.create_user(username, email, password)
     flash('Registration successful!', 'success')
-    return redirect(url_for('chat'))
+    return redirect(url_for('login'))
 
 
 # Chat page with WebSocket connection
