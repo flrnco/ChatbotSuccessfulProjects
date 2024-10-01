@@ -14,7 +14,7 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 socketio = SocketIO(app)
 
 # Create a DynamoDB client
-dynamodb = boto3.resource('dynamodb', , region_name='eu-north-1'))
+dynamodb = boto3.resource('dynamodb', , region_name='eu-north-1')
 
 # Reference to the Users and ChatHistory tables
 users_table = dynamodb.Table('Users')
