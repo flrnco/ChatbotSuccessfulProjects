@@ -120,7 +120,7 @@ def register():
             return redirect(url_for('register'))
     
         # Create new user in DynamoDB
-        User.create_user(username, email, password)
+        User.create_user(username, email, hashed_password)
         flash('Registration successful!', 'success')
         return redirect(url_for('login'))
     
