@@ -49,6 +49,10 @@ class User(UserMixin):
             return User(data['username'], data['email'], data['password'])
         return None
 
+    # Flask-Login requires this method to uniquely identify the user
+    def get_id(self):
+        return self.username
+
     @staticmethod
     def create_user(username, email, password):
         # Add a new user to DynamoDB
