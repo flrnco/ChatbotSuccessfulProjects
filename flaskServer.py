@@ -98,7 +98,7 @@ def login():
         flash('Login failed. Please check your credentials.', 'danger')
         return redirect(url_for('login'))
 
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['GET','POST'])
 def register():
     username = request.form['username']
     email = request.form['email']
