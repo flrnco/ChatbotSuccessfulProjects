@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matrix Chat - Welcome</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             margin: 0;
@@ -73,8 +74,17 @@
     </style>
 </head>
 <body>
-
     <div class="container">
+		<!-- Flash Messages -->
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				<div class="alert-container">
+					{% for category, message in messages %}
+						<div class="alert alert-{{ category }}">{{ message }}</div>
+					{% endfor %}
+				</div>
+			{% endif %}
+		{% endwith %}
         <h1>Welcome to your virtual Data Driven Assistant</h1>
         <p>Reach the next level of performance for your company.</p>
         <a href="/register" class="button">Register</a>
