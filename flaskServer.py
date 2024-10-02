@@ -10,7 +10,7 @@ import uuid
 
   
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
+app.config['SECRET_KEY'] = 'SUPER_SECRET_KEY4321'
 socketio = SocketIO(app)
 
 # Create a DynamoDB client
