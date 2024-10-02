@@ -54,7 +54,6 @@
             background-color: #006400;
         }
 
-        /* Falling code animation (Matrix effect) */
         canvas {
             position: fixed;
             top: 0;
@@ -66,21 +65,11 @@
     <canvas id="matrix"></canvas>
     
     <div id="chat-box">
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="alert-container">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
         <p>Welcome to the Matrix Chat!</p>
         <!-- Messages will appear here -->
     </div>
 
-    <input type="text" id="message-input" placeholder="Type a message..." />
+    <input type="text" id="message-input" placeholder="Type a message..." onkeypress="handleEnter(event)" />
     <button onclick="sendMessage()">Send</button>
 
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
@@ -101,61 +90,46 @@
 
         function sendMessage() {
             let message = document.getElementById('message-input').value;
-            
-            // Send the message to the backend using fetch
-            fetch('/log_chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: message }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Message logged:', data);
-                // Display the message in the chat box
-                let chatBox = document.getElementById('chat-box');
-                chatBox.innerHTML += '<p>' + message + '</p>';
-                chatBox.scrollTop = chatBox.scrollHeight;
-                document.getElementById('message-input').value = ''; // Clear input field
-            })
-            .catch(error => {
-                console.error('Error logging message:', error);
-            });
+            if (message) {
+                socket.send(message);  // Send message via SocketIO
+                document.getElementById('message-input').value = '';  // Clear the input field
+            }
+        }
+
+        // Handle "Enter" key to send the message
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
         }
 
         // Matrix background effect
         var c = document.getElementById("matrix");
         var ctx = c.getContext("2d");
 
-        // Making the canvas full screen
         c.height = window.innerHeight;
         c.width = window.innerWidth;
 
-        // Matrix characters
         var matrix = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
         matrix = matrix.split("");
 
         var font_size = 10;
-        var columns = c.width / font_size; // number of columns for the rain
+        var columns = c.width / font_size;
         var drops = [];
 
-        for (var x = 0; x < columns; x++)
-            drops[x] = 1; // Initial y position of the drops
+        for (var x = 0; x < columns; x++) drops[x] = 1;
 
         function draw() {
             ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
             ctx.fillRect(0, 0, c.width, c.height);
-
-            ctx.fillStyle = "#00FF00"; // Green text
+            ctx.fillStyle = "#00FF00";
             ctx.font = font_size + "px arial";
 
             for (var i = 0; i < drops.length; i++) {
                 var text = matrix[Math.floor(Math.random() * matrix.length)];
                 ctx.fillText(text, i * font_size, drops[i] * font_size);
 
-                if (drops[i] * font_size > c.height && Math.random() > 0.975)
-                    drops[i] = 0;
+                if (drops[i] * font_size > c.height && Math.random() > 0.975) drops[i] = 0;
 
                 drops[i]++;
             }
@@ -163,16 +137,13 @@
 
         setInterval(draw, 33);
 
-        // Adjust canvas size if the window is resized
         window.onresize = function() {
             c.height = window.innerHeight;
             c.width = window.innerWidth;
             columns = c.width / font_size;
             drops = [];
-            for (var x = 0; x < columns; x++)
-                drops[x] = 1;
-        }
+            for (var x = 0; x < columns; x++) drops[x] = 1;
+        };
     </script>
-
 </body>
 </html>
