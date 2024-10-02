@@ -90,9 +90,9 @@ def login():
         # Fetch the user from DynamoDB
         user_data = User.get_user_by_id(username)
     
-        if user_data and bcrypt.check_password_hash(user_data['password'], password):
+        if user_data and bcrypt.check_password_hash(user_data.password, password):
             # Login the user
-            user = User(username=user_data['username'], email=user_data['email'], password=user_data['password'])
+            user = User(username=user_data.username, email=user_data.email, password=user_data.password)
             login_user(user)
             flash('Login successful!', 'success')
             return redirect(url_for('chat'))
