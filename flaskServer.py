@@ -99,8 +99,7 @@ def login():
             user = User(username=user_data.username, email=user_data.email, password=user_data.password)
             login_user(user)
             flash('Login successful!', 'success')
-            return
-            #return redirect(url_for('chat'))
+            return redirect(url_for('chat'))
         else:
             flash('Login failed. Please check your credentials.', 'danger')
             return redirect(url_for('login'))
