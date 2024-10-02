@@ -100,22 +100,28 @@ def login():
 
 @app.route('/register', methods=['GET','POST'])
 def register():
-    username = request.form['username']
-    email = request.form['email']
-    password = request.form['password']
-
-    # Hash the password
-    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-
-    # Check if user already exists
-    if User.get_user_by_username(username):
-        flash('Username already exists!', 'danger')
-        return redirect(url_for('register'))
-
-    # Create new user in DynamoDB
-    User.create_user(username, email, password)
-    flash('Registration successful!', 'success')
-    return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        # Handle the POST form submission
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+    
+        # Hash the password
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    
+        # Check if user already exists
+        if User.get_user_by_username(username):
+            flash('Username already exists!', 'danger')
+            return redirect(url_for('register'))
+    
+        # Create new user in DynamoDB
+        User.create_user(username, email, password)
+        flash('Registration successful!', 'success')
+        return redirect(url_for('login'))
+    
+    # If it's a GET request, render the registration form
+    return render_template('register.html')  # Ensure 'register.html' exists in the templates folder
 
 
 # Chat page with WebSocket connection
