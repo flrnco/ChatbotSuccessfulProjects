@@ -83,13 +83,15 @@
         });
 
         socket.on('message', function(msg) {
-            let chatBox = document.getElementById('chat-box');
+            console.log('Message from server:', msg);  // Add this to debug
+			let chatBox = document.getElementById('chat-box');
             chatBox.innerHTML += '<p>' + msg + '</p>';
             chatBox.scrollTop = chatBox.scrollHeight;
         });
 
         function sendMessage() {
-            let message = document.getElementById('message-input').value;
+            console.log('Sending message:', message);  // Add this to debug
+			let message = document.getElementById('message-input').value;
             if (message) {
                 socket.send(message);  // Send message via SocketIO
                 document.getElementById('message-input').value = '';  // Clear the input field
