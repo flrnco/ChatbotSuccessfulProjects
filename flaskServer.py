@@ -80,23 +80,27 @@ def index():
 #        return redirect('/chat')
 #    return render_template('login.html')
     
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET','POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
-
-    # Fetch the user from DynamoDB
-    user_data = User.get_user_by_id(username)
-
-    if user_data and bcrypt.check_password_hash(user_data['password'], password):
-        # Login the user
-        user = User(username=user_data['username'], email=user_data['email'], password=user_data['password'])
-        login_user(user)
-        flash('Login successful!', 'success')
-        return redirect(url_for('chat'))
-    else:
-        flash('Login failed. Please check your credentials.', 'danger')
-        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+    
+        # Fetch the user from DynamoDB
+        user_data = User.get_user_by_id(username)
+    
+        if user_data and bcrypt.check_password_hash(user_data['password'], password):
+            # Login the user
+            user = User(username=user_data['username'], email=user_data['email'], password=user_data['password'])
+            login_user(user)
+            flash('Login successful!', 'success')
+            return redirect(url_for('chat'))
+        else:
+            flash('Login failed. Please check your credentials.', 'danger')
+            return redirect(url_for('login'))
+    # If it's a GET request, render the registration form
+    return render_template('login.html')  # Ensure 'login.html' exists in the templates folder
 
 @app.route('/register', methods=['GET','POST'])
 def register():
