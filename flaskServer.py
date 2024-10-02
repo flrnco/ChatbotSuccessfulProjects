@@ -111,7 +111,7 @@ def register():
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     
         # Check if user already exists
-        if User.get_user_by_username(username):
+        if User.get_user_by_id(username):
             flash('Username already exists!', 'danger')
             return redirect(url_for('register'))
     
