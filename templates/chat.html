@@ -90,13 +90,18 @@
         });
 
         function sendMessage() {
-            console.log('Sending message:', message);  // Add this to debug
+			// Properly declare and initialize the 'message' variable
 			let message = document.getElementById('message-input').value;
-            if (message) {
-                socket.send(message);  // Send message via SocketIO
-                document.getElementById('message-input').value = '';  // Clear the input field
-            }
-        }
+			console.log('Sending message:', message);  // Log the message being sent
+			
+			// Check if the message is not empty
+			if (message && message.trim() !== '') {
+				socket.send(message);  // Send the message via SocketIO
+				document.getElementById('message-input').value = '';  // Clear the input field
+			} else {
+				console.log('No message to send.');  // If the input is empty
+			}
+		}
 
         // Handle "Enter" key to send the message
         function handleEnter(event) {
