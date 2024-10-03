@@ -7,11 +7,13 @@ import boto3
 from flask import request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
 import uuid
+import eventlet
+
 
   
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'SUPER_SECRET_KEY4321'
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Create a DynamoDB client
 dynamodb = boto3.resource('dynamodb', region_name='eu-north-1')
@@ -171,6 +173,7 @@ def log_chat():
 def handle_message(message):
     # Integrate your robot logic here
     #response = your_robot_script.process_message(message)
+    print(f"Message received: {message}")
     response = "Ok, I'll work on it buddy !"
     send(response, broadcast=True)
 
