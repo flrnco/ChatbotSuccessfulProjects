@@ -38,6 +38,7 @@ logging.basicConfig(level=logging.INFO, stream=sys.stdout,
 ### DEBUG TRACE IF NECESSARY
 #logging.basicConfig(level=logging.DEBUG, stream=sys.stdout, 
 #                    format='%(asctime)s %(levelname)s %(message)s')
+logger = logging.getLogger(__name__)
 
 # User class for authentication
 # V1
