@@ -8,6 +8,7 @@ from flask import request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
 import uuid
 import eventlet
+from datetime import datetime
 
 
   
@@ -175,6 +176,28 @@ def handle_message(message):
     #response = your_robot_script.process_message(message)
     print(f"Message received: {message}")
     response = "Ok, I'll work on it buddy !"
+    
+    # Generate a unique ID for each message (you can use UUID or similar)
+    message_id = str(uuid4())
+    
+    # Get the current timestamp
+    timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+
+    # Store the chat history in DynamoDB
+    try:
+        chat_table.put_item(
+            Item={
+                'message_id': message_id,           # Primary key
+                'timestamp': timestamp,             # When the message was received
+                'user_message': message,            # The message sent by the user
+                'server_response': response,        # The server's response
+            }
+        )
+        print(f"Chat logged successfully: {message_id}")
+    except Exception as e:
+        print(f"Error logging chat to DynamoDB: {e}")
+
+    # Send the server response to the client
     send(response, broadcast=True)
 
 # Log out route
