@@ -6,7 +6,7 @@ import boto3
 # libraries to manage credentials
 from flask import request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
-import uuid
+from uuid import uuid4
 import eventlet
 from datetime import datetime
 
