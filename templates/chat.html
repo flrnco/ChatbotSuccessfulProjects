@@ -76,7 +76,9 @@
 
     <script>
         // SocketIO connection
-        var socket = io();
+        var socket = io('http://13.60.225.41', {
+			transports: ['websocket', 'polling']
+		});
 
         socket.on('connect', function() {
             console.log('Connected to server');
