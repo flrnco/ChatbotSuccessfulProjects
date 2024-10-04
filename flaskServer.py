@@ -9,6 +9,8 @@ from flask_bcrypt import Bcrypt
 from uuid import uuid4
 import eventlet
 from datetime import datetime
+import logging
+import sys
 
 
   
@@ -29,6 +31,13 @@ bcrypt = Bcrypt(app)
 # User login management
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+# Manage print into log files
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, 
+                    format='%(asctime)s %(levelname)s %(message)s')
+### DEBUG TRACE IF NECESSARY
+#logging.basicConfig(level=logging.DEBUG, stream=sys.stdout, 
+#                    format='%(asctime)s %(levelname)s %(message)s')
 
 # User class for authentication
 # V1
@@ -174,7 +183,7 @@ def log_chat():
 def handle_message(message):
     # Integrate your robot logic here
     #response = your_robot_script.process_message(message)
-    print(f"Message received: {message}")
+    logger.info(f"Message received: {message}")
     response = "Ok, I'll work on it buddy !"
     
     # Generate a unique ID for each message (you can use UUID or similar)
@@ -193,9 +202,9 @@ def handle_message(message):
                 'server_response': response,        # The server's response
             }
         )
-        print(f"Chat logged successfully: {message_id}")
+        logger.info(f"Chat logged successfully: {message_id}")
     except Exception as e:
-        print(f"Error logging chat to DynamoDB: {e}")
+        logger.error(f"Error logging chat to DynamoDB: {e}")
 
     # Send the server response to the client
     send(response, broadcast=True)
