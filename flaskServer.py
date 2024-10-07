@@ -192,12 +192,18 @@ def handle_message(message):
     
     # Get the current timestamp
     timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    
+    # Get username
+    username = 'Guest'
+    if current_user.is_authenticated:
+        username = current_user.username
 
     # Store the chat history in DynamoDB
     try:
         chat_table.put_item(
             Item={
-                'message_id': message_id,           # Primary key
+                'username': username,               # Primary key
+                'message_id': message_id,           # ID of the message
                 'timestamp': timestamp,             # When the message was received
                 'user_message': message,            # The message sent by the user
                 'server_response': response,        # The server's response
