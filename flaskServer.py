@@ -7,6 +7,7 @@ from uuid import uuid4
 from datetime import datetime
 import logging
 import sys
+from flask import flash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'SUPER_SECRET_KEY4321'
