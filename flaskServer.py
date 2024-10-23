@@ -9,6 +9,31 @@ import logging
 import sys
 from flask import request, redirect, url_for, flash
 import eventlet
+# Local packages
+from AI_chat_engine import *
+import time    							# To measure time performance
+import sys
+import numpy as np
+
+###########################################################################
+#            RUN                                                          #
+###########################################################################
+start_time=time.time()
+problemName='AI Conversational Engine'
+
+#training_or_test = BOM.TRAINING_MODE_g           # TRAINING_MODE_g : read training file, train and write weights // TEST_MODE_g : load weights and test sentences
+training_or_test = BOM.TEST_MODE_g           # TRAINING_MODE_g : read training file, train and write weights // TEST_MODE_g : load weights and test sentences
+
+# Creation of the Business Object Manager
+myBOM=BOM.BusinessObjectsManager(problemName)
+# Read input
+myReader=READER.Parameters (myBOM,mode=training_or_test,debugLevel=0)
+myReader.read()
+# Init Conversational Engine
+myConversationalEngine = ENGINE.ConversationalEngine(myBOM)
+myConversationalEngine.manage_inputs_and_prepare_structures()
+# Load model
+myConversationalEngine.loadModel()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'SUPER_SECRET_KEY4321'
@@ -136,8 +161,36 @@ def log_chat():
 @socketio.on('message')
 def handle_message(message):
     logger.info(f"Message received: {message}")
-    response = "Ok, I'll work on it buddy !"
-
+    
+    # Build a response
+    # Preprocess sentences
+    X_test = myConversationalEngine.preprocess_set_of_sentences(message)
+        
+    # Make predictions using the trained model
+    predictions = myConversationalEngine.predict(X_test)
+    
+    # Get the class with the highest probability (0 or 1)
+    question_labels = np.argmax(predictions['question'], axis=1)
+    objective_labels = np.argmax(predictions['objective'], axis=1)
+    
+    isThereAQuestion_l = 0
+    isThereAnObjective_l = 0
+    for i, sentence in enumerate(test_sentences):
+        if question_labels[i] == 1:
+            isThereAQuestion_l = 1
+        if objective_labels[i] == 1:
+            isThereAnObjective_l = 1
+    
+    response = ""
+    if isThereAQuestion_l > 0:
+        response = "Sorry, I didn't get your question, could you rephrase ? What is your goal ?"
+    elif isThereAnObjective_l > 0:
+        # capture the objective
+        objective_l = myConversationalEngine.extract_action(message)
+        response = "Ok great ! So if I understand correctly your goal is to "+objective_l+". Right ?"
+    else:
+        response = "Sorry I didn't catch your answer. Can you tell me what is the objective that you want us to work on ?"
+    
     message_id = str(uuid4())
     timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
 
