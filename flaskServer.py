@@ -159,7 +159,7 @@ def handle_message(message):
     except Exception as e:
         logger.error(f"Error logging chat to DynamoDB: {e}")
 
-    send(response, broadcast=True)
+    send(response, broadcast=False)
 
 @app.route('/logout')
 @login_required
